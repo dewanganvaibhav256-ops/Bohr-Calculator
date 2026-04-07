@@ -1,3 +1,2 @@
-# Welcome to your Lovable project
+# Bohr Atomic Calculator
 
-TODO: Document your project here
