@@ -89,7 +89,9 @@ export default function BohrCalculator() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in" style={{ animationDelay: "0.15s" }}>
           {/* Left: Visualization */}
           <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6 glow-primary space-y-4">
-            <AtomVisualization Z={Z} ni={ni} nf={nf} wavelengthNm={results?.lam ?? null} />
+            <Suspense fallback={<div className="w-full aspect-square max-h-[400px] rounded-2xl bg-secondary/30 flex items-center justify-center text-muted-foreground text-sm">Loading 3D model...</div>}>
+              <Atom3D Z={Z} ni={ni} nf={nf} wavelengthNm={results?.lam ?? null} />
+            </Suspense>
             <EnergyLevelDiagram ni={ni} nf={nf} Z={Z} wavelengthNm={results?.lam ?? null} />
           </div>
 
