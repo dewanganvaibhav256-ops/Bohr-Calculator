@@ -19,7 +19,7 @@ The calculator is powered by the following Bohr's Model equations:
 - **Velocity ($v_n$):** $$v_n = 2.18 \times 10^6 \times \frac{Z}{n} \, \text{m/s}$$
 - **Energy ($E_n$):** $$E_n = -13.6 \times \frac{Z^2}{n^2} \, \text{eV}$$
 
-*Where $n$ is the Principal Quantum Number and Z is the Atomic Number.*
+*Where n is the Principal Quantum Number and Z is the Atomic Number.*
 
 ## 💻 Technologies Used
 - **HTML5:** Semantic structure.
