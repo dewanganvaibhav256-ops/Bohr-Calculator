@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import AtomVisualization from "@/components/AtomVisualization";
+import Atom3D from "@/components/Atom3D";
 import EnergyLevelDiagram from "@/components/EnergyLevelDiagram";
+import BohrTheory from "@/components/BohrTheory";
 
 const A0 = 5.29e-11;
 const RY = 1.097e7;
@@ -88,7 +89,9 @@ export default function BohrCalculator() {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in" style={{ animationDelay: "0.15s" }}>
           {/* Left: Visualization */}
           <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6 glow-primary space-y-4">
-            <AtomVisualization Z={Z} ni={ni} nf={nf} wavelengthNm={results?.lam ?? null} />
+            <Suspense fallback={<div className="w-full aspect-square max-h-[400px] rounded-2xl bg-secondary/30 flex items-center justify-center text-muted-foreground text-sm">Loading 3D model...</div>}>
+              <Atom3D Z={Z} ni={ni} nf={nf} wavelengthNm={results?.lam ?? null} />
+            </Suspense>
             <EnergyLevelDiagram ni={ni} nf={nf} Z={Z} wavelengthNm={results?.lam ?? null} />
           </div>
 
@@ -156,6 +159,12 @@ export default function BohrCalculator() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+        {/* Theory Section */}
+        <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6">
+            <BohrTheory />
           </div>
         </div>
       </div>
