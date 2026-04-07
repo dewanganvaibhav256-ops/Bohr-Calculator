@@ -161,6 +161,12 @@ export default function BohrCalculator() {
             )}
           </div>
         </div>
+        {/* Theory Section */}
+        <div className="animate-fade-in" style={{ animationDelay: "0.3s" }}>
+          <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6">
+            <BohrTheory />
+          </div>
+        </div>
       </div>
     </div>
   );
