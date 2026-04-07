@@ -15,7 +15,7 @@ A simple and interactive web application to calculate various parameters of the 
 ## 📐 Formulas Used
 The calculator is powered by the following Bohr's Model equations:
 
-- **Radius ($r_n$):** $$r_n = 0.529 \times \frac{n^2}{Z} \, \text{\AA}$$
+- **Radius ($r_n$):** $$r_n = 0.529 \times \frac{n^2}{Z} \, \text{}$$
 - **Velocity ($v_n$):** $$v_n = 2.18 \times 10^6 \times \frac{Z}{n} \, \text{m/s}$$
 - **Energy ($E_n$):** $$E_n = -13.6 \times \frac{Z^2}{n^2} \, \text{eV}$$
 
