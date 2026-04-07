@@ -1,8 +1,9 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, Suspense } from "react";
 import { Label } from "@/components/ui/label";
 import { Slider } from "@/components/ui/slider";
-import AtomVisualization from "@/components/AtomVisualization";
+import Atom3D from "@/components/Atom3D";
 import EnergyLevelDiagram from "@/components/EnergyLevelDiagram";
+import BohrTheory from "@/components/BohrTheory";
 
 const A0 = 5.29e-11;
 const RY = 1.097e7;
