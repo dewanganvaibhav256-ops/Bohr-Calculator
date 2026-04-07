@@ -1,33 +1,47 @@
 import { useState, useMemo } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Atom } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import AtomVisualization from "@/components/AtomVisualization";
+import EnergyLevelDiagram from "@/components/EnergyLevelDiagram";
 
-const RY = 1.097e7; // Rydberg constant (m^-1)
-const A0 = 5.29e-11; // Bohr radius (m)
+const A0 = 5.29e-11;
+const RY = 1.097e7;
 
-function energy(n: number, Z: number) {
-  return -13.6 * Z ** 2 / n ** 2;
-}
-
-function radius(n: number, Z: number) {
-  return A0 * n ** 2 / Z;
-}
-
+function energy(n: number, Z: number) { return -13.6 * Z ** 2 / n ** 2; }
+function radius(n: number, Z: number) { return A0 * n ** 2 / Z; }
 function wavelength(ni: number, nf: number, Z: number) {
   if (ni <= nf) return null;
-  const inv = RY * Z ** 2 * (1 / nf ** 2 - 1 / ni ** 2);
-  return 1e9 / inv; // nm
+  return 1e9 / (RY * Z ** 2 * (1 / nf ** 2 - 1 / ni ** 2));
 }
 
-function ResultRow({ label, value, unit }: { label: string; value: string; unit: string }) {
+function wavelengthToColor(nm: number): string {
+  if (nm < 380) return "hsl(280, 80%, 60%)";
+  if (nm < 490) return "hsl(220, 85%, 55%)";
+  if (nm < 560) return "hsl(140, 85%, 45%)";
+  if (nm < 600) return "hsl(50, 90%, 50%)";
+  if (nm < 650) return "hsl(25, 95%, 50%)";
+  return "hsl(0, 90%, 50%)";
+}
+
+function spectrumLabel(nm: number): string {
+  if (nm < 380) return "Ultraviolet";
+  if (nm < 450) return "Violet";
+  if (nm < 490) return "Blue";
+  if (nm < 560) return "Green";
+  if (nm < 590) return "Yellow";
+  if (nm < 650) return "Orange";
+  if (nm < 780) return "Red";
+  return "Infrared";
+}
+
+function ResultCard({ label, value, unit, color }: { label: string; value: string; unit: string; color?: string }) {
   return (
-    <div className="flex items-center justify-between py-3 border-b border-border last:border-0">
-      <span className="text-sm text-muted-foreground">{label}</span>
-      <span className="font-mono text-sm font-semibold text-foreground">
-        {value} <span className="text-muted-foreground font-normal">{unit}</span>
-      </span>
+    <div className="rounded-lg bg-secondary/50 border border-border p-3 text-center">
+      <div className="text-[10px] uppercase tracking-widest text-muted-foreground mb-1">{label}</div>
+      <div className="font-mono text-lg font-semibold" style={color ? { color } : {}}>
+        {value}
+      </div>
+      <div className="text-[10px] text-muted-foreground">{unit}</div>
     </div>
   );
 }
@@ -39,65 +53,111 @@ export default function BohrCalculator() {
 
   const results = useMemo(() => {
     if (Z < 1 || ni < 1 || nf < 1) return null;
-    const r = radius(ni, Z);
-    const Ei = energy(ni, Z);
-    const Ef = energy(nf, Z);
-    const lam = wavelength(ni, nf, Z);
-    return { r, Ei, Ef, lam };
+    return {
+      r: radius(ni, Z),
+      Ei: energy(ni, Z),
+      Ef: energy(nf, Z),
+      lam: wavelength(ni, nf, Z),
+    };
   }, [Z, ni, nf]);
 
+  const photonColor = results?.lam ? wavelengthToColor(results.lam) : undefined;
+
   return (
-    <div className="min-h-screen flex items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-6">
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-primary/10 text-primary mb-2">
-            <Atom className="w-6 h-6" />
-          </div>
-          <h1 className="text-2xl font-bold tracking-tight text-foreground">Bohr Model Calculator</h1>
-          <p className="text-sm text-muted-foreground">Calculate energy levels, orbital radii, and transition wavelengths</p>
+    <div className="min-h-screen flex flex-col items-center justify-center p-4 md:p-8 overflow-hidden relative">
+      {/* Subtle background grid */}
+      <div className="absolute inset-0 opacity-[0.03]"
+        style={{
+          backgroundImage: "radial-gradient(circle at 1px 1px, hsl(200, 90%, 55%) 1px, transparent 0)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      <div className="relative w-full max-w-4xl space-y-8">
+        {/* Header */}
+        <div className="text-center space-y-2 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+            Bohr Model <span className="text-primary text-glow-primary">Calculator</span>
+          </h1>
+          <p className="text-sm text-muted-foreground max-w-md mx-auto">
+            Explore hydrogen-like atoms — drag the sliders to visualize electron transitions
+          </p>
         </div>
 
-        <Card>
-          <CardHeader className="pb-4">
-            <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Parameters</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-3 gap-3">
-              <div className="space-y-1.5">
-                <Label htmlFor="z" className="text-xs">Atomic Number (Z)</Label>
-                <Input id="z" type="number" min={1} value={Z} onChange={e => setZ(Number(e.target.value))} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="ni" className="text-xs">Initial Level (nᵢ)</Label>
-                <Input id="ni" type="number" min={1} value={ni} onChange={e => setNi(Number(e.target.value))} />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="nf" className="text-xs">Final Level (n_f)</Label>
-                <Input id="nf" type="number" min={1} value={nf} onChange={e => setNf(Number(e.target.value))} />
+        {/* Main content */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 animate-fade-in" style={{ animationDelay: "0.15s" }}>
+          {/* Left: Visualization */}
+          <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6 glow-primary space-y-4">
+            <AtomVisualization Z={Z} ni={ni} nf={nf} wavelengthNm={results?.lam ?? null} />
+            <EnergyLevelDiagram ni={ni} nf={nf} Z={Z} wavelengthNm={results?.lam ?? null} />
+          </div>
+
+          {/* Right: Controls + Results */}
+          <div className="space-y-6">
+            {/* Sliders */}
+            <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6 space-y-6">
+              <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Parameters</div>
+
+              <div className="space-y-5">
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-sm text-secondary-foreground">Atomic Number (Z)</Label>
+                    <span className="font-mono text-sm text-primary font-semibold">{Z}</span>
+                  </div>
+                  <Slider min={1} max={10} step={1} value={[Z]} onValueChange={v => setZ(v[0])} />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-sm text-secondary-foreground">Initial Level (nᵢ)</Label>
+                    <span className="font-mono text-sm text-primary font-semibold">{ni}</span>
+                  </div>
+                  <Slider min={1} max={7} step={1} value={[ni]} onValueChange={v => setNi(v[0])} />
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex justify-between items-center">
+                    <Label className="text-sm text-secondary-foreground">Final Level (nf)</Label>
+                    <span className="font-mono text-sm text-accent font-semibold">{nf}</span>
+                  </div>
+                  <Slider min={1} max={7} step={1} value={[nf]} onValueChange={v => setNf(v[0])} />
+                </div>
               </div>
             </div>
-          </CardContent>
-        </Card>
 
-        {results && (
-          <Card>
-            <CardHeader className="pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Results</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResultRow label={`Radius (n=${ni})`} value={results.r.toExponential(3)} unit="m" />
-              <ResultRow label={`Energy (n=${ni})`} value={results.Ei.toFixed(2)} unit="eV" />
-              <ResultRow label={`Energy (n=${nf})`} value={results.Ef.toFixed(2)} unit="eV" />
-              {results.lam ? (
-                <ResultRow label="Wavelength" value={results.lam.toFixed(2)} unit="nm" />
-              ) : (
-                <div className="py-3 text-sm text-destructive">
-                  Invalid transition (nᵢ must be &gt; n_f)
+            {/* Results */}
+            {results && (
+              <div className="rounded-2xl bg-card/60 backdrop-blur border border-border p-6 space-y-4 animate-fade-in">
+                <div className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Results</div>
+
+                <div className="grid grid-cols-2 gap-3">
+                  <ResultCard label={`Radius (n=${ni})`} value={results.r.toExponential(3)} unit="meters" />
+                  <ResultCard label={`Energy (n=${ni})`} value={results.Ei.toFixed(2)} unit="eV" />
+                  <ResultCard label={`Energy (n=${nf})`} value={results.Ef.toFixed(2)} unit="eV" />
+                  <ResultCard label="ΔE" value={Math.abs(results.Ei - results.Ef).toFixed(2)} unit="eV" />
                 </div>
-              )}
-            </CardContent>
-          </Card>
-        )}
+
+                {results.lam ? (
+                  <div className="rounded-xl border border-border p-4 text-center space-y-2"
+                    style={{ borderColor: photonColor ? `${photonColor.replace(")", " / 0.3)")}` : undefined }}>
+                    <div className="text-[10px] uppercase tracking-widest text-muted-foreground">Emitted Photon</div>
+                    <div className="font-mono text-2xl font-bold" style={{ color: photonColor }}>
+                      {results.lam.toFixed(2)} <span className="text-sm font-normal">nm</span>
+                    </div>
+                    <div className="inline-flex items-center gap-2 text-xs text-muted-foreground">
+                      <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: photonColor }} />
+                      {spectrumLabel(results.lam)}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="rounded-xl border border-border p-4 text-center text-sm text-muted-foreground">
+                    {ni === nf ? "Same level — no transition" : "Absorption (nᵢ < nf) — swap levels for emission"}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );
