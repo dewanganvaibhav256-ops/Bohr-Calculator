@@ -4,7 +4,7 @@
 A simple and interactive web application to calculate various parameters of the Bohr Model of an atom. This tool helps in finding the radius, velocity, and energy of an electron in different orbits for Hydrogen and Hydrogen-like species.
 
 ## 🚀 Live Demo
-[Add your GitHub Pages link here]
+https://quantum-joy.lovable.app
 
 ## 🛠️ Features
 - **Radius Calculation:** Find the radius of the $n^{th}$ orbit.
