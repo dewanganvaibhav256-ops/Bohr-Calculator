@@ -5,11 +5,11 @@ A simple and interactive web application to calculate various parameters of the 
 
 ## By Group 15:-
 
-Vaibhav Dewangan (25MIM10135)
-Gaurav Kumar  (25BSA10169)
-Sunny kumar yadav (25BCE11132)
-Vibhor Srivastava (25MIM10093)
-Udit Ravikant Chaubey (25BCE11330)
+- Vaibhav Dewangan (25MIM10135)
+- Gaurav Kumar  (25BSA10169)
+- Sunny kumar yadav (25BCE11132)
+- Vibhor Srivastava (25MIM10093)
+- Udit Ravikant Chaubey (25BCE11330)
 
 ## 🚀 Live Demo
 https://bohr-model-calculator.lovable.app
